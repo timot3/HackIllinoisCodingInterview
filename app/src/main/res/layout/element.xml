@@ -7,7 +7,10 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     card_view:cardPreventCornerOverlap="false"
+    card_view:cardCornerRadius="20dp"
+
     app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="20dp"
 
     android:layout_margin="6dp">
     <RelativeLayout

@@ -1,8 +1,10 @@
 package com.example.myapplication
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -14,10 +16,9 @@ import org.json.JSONObject
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , ElementAdapter.OnItemClickListener{
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,13 +38,21 @@ class MainActivity : AppCompatActivity() {
             val dt = DateTimeFormatter.ISO_INSTANT
                 .format(java.time.Instant.ofEpochSecond(time))
 
-            val item = Element(event.get("name") as String, event.get("description") as String, dt)
+            val ldt =
+                Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
+
+            val newTime = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm").format(ldt)
+
+            Log.d("DATE TIME<<<<<<<<", newTime.toString())
+
+            val item = Element(event.get("name") as String, event.get("description") as String, newTime)
             list += item
         }
-        recycler_view.adapter = ElementAdapter(list)
+        recycler_view.adapter = ElementAdapter(list, this)
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.setHasFixedSize(true)
     }
+
     fun makeRequest(view: RecyclerView) {
         Log.d("IN FUNCTION makeRequest", "HERE")
         var jsonArr : JSONArray = JSONArray()
@@ -63,28 +72,16 @@ class MainActivity : AppCompatActivity() {
             },
             Response.ErrorListener { error ->
 //                textView.text = "That didn't work!"
-                Log.e("ERROR", "That didn't work!")
+                Log.e("ERROR", error.toString())
             }
         )
 //        viewText.text = txt
         queue.add(jsonObjectRequest)
     }
-}
-/*
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val url : String = "https://api.hackillinois.org/event/"
-//        val textView: TextView = findViewById<TextView>(R.id.text_view)
-
-//        val obj : JSONObject = makeRequest(url, textView)
-
-
-
-
+    override fun onItemClick(position: Int) {
+        Toast.makeText(this, "Item $position clicked", Toast.LENGTH_SHORT).show()
+//        val clickedItem = exampleList[position]
+//        clickedItem.text1 = "Clicked"
+//        adapter.notifyItemChanged(position)
     }
-
-
-}*/
+}
